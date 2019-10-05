@@ -13,7 +13,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
     
     var webView: WKWebView!
     var progressView: UIProgressView!
-    var websites = ["apple.com", "hackingwithswift.com"]
+    var selectedIndex: Int!
     
     override func loadView() {
         webView = WKWebView()
@@ -23,7 +23,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "https://" + websites[0])!
+        let url = URL(string: "https://" + websites[selectedIndex])!
         webView.load(URLRequest(url: url))
         webView.allowsBackForwardNavigationGestures = true
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
@@ -33,8 +33,10 @@ class ViewController: UIViewController, WKNavigationDelegate {
         let progressButton = UIBarButtonItem(customView: progressView)
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
+        let back = UIBarButtonItem(barButtonSystemItem: .rewind, target: webView, action: #selector(webView.goBack))
+        let forward = UIBarButtonItem(barButtonSystemItem: .fastForward, target: webView, action: #selector(webView.goForward))
 
-        toolbarItems = [progressButton, spacer, refresh]
+        toolbarItems = [progressButton, back, forward, spacer, refresh]
         navigationController?.isToolbarHidden = false
         
     }
@@ -74,6 +76,9 @@ class ViewController: UIViewController, WKNavigationDelegate {
                     return
                 }
             }
+            let ac = UIAlertController(title: "Blocked page", message: nil, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Ok", style: .cancel))
+            present(ac, animated: true)
         }
 
         decisionHandler(.cancel)
